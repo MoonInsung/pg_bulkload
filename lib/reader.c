@@ -1110,7 +1110,7 @@ FilterTuple(Filter *filter, TupleFormer *former, int *parsing_field)
 	/*
 	 * If function result is NULL, return tuple, it's all columns of null.
 	 */
-#if PG_VERSION_NUM >= 12000
+#if PG_VERSION_NUM >= 120000
 	if (fcinfo->isnull)
 #else
 	if (fcinfo.isnull)

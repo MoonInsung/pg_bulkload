@@ -336,7 +336,11 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 	self->rsinfo.isDone = ExprSingleResult;
 	self->rsinfo.setResult = NULL;
 	self->rsinfo.setDesc = NULL;
+#if PG_VERSION_NUM >= 120000
 	self->funcResultSlot = MakeSingleTupleTableSlot(self->desc, &TTSOpsHeapTuple);
+#else
+	self->funcResultSlot = MakeSingleTupleTableSlot(self->desc);
+#endif
 }
 
 static int64
