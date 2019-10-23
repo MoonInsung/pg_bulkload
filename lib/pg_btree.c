@@ -21,6 +21,9 @@
 #include "storage/fd.h"
 #include "storage/lmgr.h"
 #include "storage/smgr.h"
+#if PG_VERSION_NUM >= 120000
+#include "storage/md.h"
+#endif
 #include "utils/builtins.h"
 #include "utils/lsyscache.h"
 #include "utils/memutils.h"

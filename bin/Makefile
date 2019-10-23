@@ -64,6 +64,8 @@ sql/init-10.sql:
 	cp sql/init-extension.sql sql/init-10.sql
 sql/init-11.sql:
 	cp sql/init-extension.sql sql/init-11.sql
+sql/init-12.sql:
+	cp sql/init-extension-v2.sql sql/init-12.sql
 
 sql/load_filter.sql: sql/load_filter-$(MAJORVERSION).sql
 	cp sql/load_filter-$(MAJORVERSION).sql sql/load_filter.sql
@@ -89,6 +91,8 @@ sql/load_filter-10.sql:
 	cp sql/load_filter-v2.sql sql/load_filter-10.sql
 sql/load_filter-11.sql:
 	cp sql/load_filter-v2.sql sql/load_filter-11.sql
+sql/load_filter-12.sql:
+	cp sql/load_filter-v2.sql sql/load_filter-12.sql
 
 sql/load_function.sql: sql/load_function-$(MAJORVERSION).sql
 	cp sql/load_function-$(MAJORVERSION).sql sql/load_function.sql
@@ -114,14 +118,16 @@ sql/load_function-10.sql:
 	cp sql/load_function-v2.sql sql/load_function-10.sql
 sql/load_function-11.sql:
 	cp sql/load_function-v2.sql sql/load_function-11.sql
+sql/load_function-12.sql:
+	cp sql/load_function-v2.sql sql/load_function-12.sql
 
 .PHONY: subclean
 clean: subclean
 
 subclean:
-	rm -f sql/init.sql sql/init-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11}.sql
-	rm -f sql/load_filter.sql sql/load_filter-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11}.sql
-	rm -f sql/load_function.sql sql/load_function-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11}.sql
+	rm -f sql/init.sql sql/init-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11,12}.sql
+	rm -f sql/load_filter.sql sql/load_filter-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11,12}.sql
+	rm -f sql/load_function.sql sql/load_function-{8.3,8.4,9.0,9.1,9.2,9.3,9.4,9.5,9.6,10,11,12}.sql
 
 installcheck: sql/init.sql sql/load_function.sql sql/load_filter.sql
 
