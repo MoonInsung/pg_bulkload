@@ -37,15 +37,19 @@ typedef struct FunctionParser
 {
 	Parser	base;
 
-	FmgrInfo				flinfo;
-	FunctionCallInfoData	fcinfo;
-	TupleDesc				desc;
-	EState				   *estate;
-	ExprContext			   *econtext;
-	ExprContext			   *arg_econtext;
-	ReturnSetInfo			rsinfo;
-	HeapTupleData			tuple;
-	TupleTableSlot		   *funcResultSlot;
+	FmgrInfo					flinfo;
+#if PG_VERSION_NUM >= 120000
+	FunctionCallInfoBaseData	fcinfo;
+#else
+	FunctionCallInfoData		fcinfo;
+#endif
+	TupleDesc					desc;
+	EState					   *estate;
+	ExprContext			       *econtext;
+	ExprContext			       *arg_econtext;
+	ReturnSetInfo				rsinfo;
+	HeapTupleData				tuple;
+	TupleTableSlot		       *funcResultSlot;
 } FunctionParser;
 
 static void	FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, TupleDesc desc, bool multi_process, Oid collation);
@@ -150,7 +154,11 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 			if (self->flinfo.fn_strict)
 				ereport(ERROR, (errcode(ERRCODE_INVALID_PARAMETER_VALUE),
 					errmsg("function is strict, but argument %d is NULL", i)));
+#if PG_VERSION_NUM >= 120000
+			self->fcinfo.args[i].isnull = true;
+#else
 			self->fcinfo.argnull[i] = true;
+#endif
 		}
 		else
 		{
@@ -158,9 +166,16 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 			Oid			typioparam;
 
 			getTypeInputInfo(pp->proargtypes.values[i], &typinput, &typioparam);
+#if PG_VERSION_NUM >= 120000
+			self->fcinfo.args[i].value = OidInputFunctionCall(typinput,
+									(char *) function.args[i], typioparam, -1);
+			self->fcinfo. args[i].isnull = false;
+
+#else
 			self->fcinfo.arg[i] = OidInputFunctionCall(typinput,
 									(char *) function.args[i], typioparam, -1);
 			self->fcinfo.argnull[i] = false;
+#endif
 			pfree(function.args[i]);
 		}
 	}
@@ -213,7 +228,11 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 		lbs[0] = 1;
 		arry = construct_md_array(elems, nulls, 1, dims, lbs, element_type,
 								  elmlen, elmbyval, elmalign);
+#if PG_VERSION_NUM >= 120000
+		self->fcinfo.args[nfixedarg].value = PointerGetDatum(arry);
+#else
 		self->fcinfo.arg[nfixedarg] = PointerGetDatum(arry);
+#endif
 	}
 
 	/*
@@ -262,13 +281,20 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 
 			argstate = ExecInitExpr(expr, NULL);
 
+#if PG_VERSION_NUM >= 120000
+			self->fcinfo.args[nargs].value = ExecEvalExpr(argstate,
+														  self->arg_econtext,
+														  &self->fcinfo.args[nargs].isnull);
+#elif PG_VERSION_NUM >= 100000
+			self->fcinfo.arg[nargs] = ExecEvalExpr(argstate,
+												   self->arg_econtext,
+												   &self->fcinfo.argnull[nargs]);
+#else
 			self->fcinfo.arg[nargs] = ExecEvalExpr(argstate,
 												   self->arg_econtext,
 												   &self->fcinfo.argnull[nargs]
-#if PG_VERSION_NUM < 100000
-												   ,&thisArgIsDone
+												   ,&thisArgIsDone);
 #endif
-												   );
 
 #if PG_VERSION_NUM < 100000
 			if (thisArgIsDone != ExprSingleResult)
@@ -310,7 +336,7 @@ FunctionParserInit(FunctionParser *self, Checker *checker, const char *infile, T
 	self->rsinfo.isDone = ExprSingleResult;
 	self->rsinfo.setResult = NULL;
 	self->rsinfo.setDesc = NULL;
-	self->funcResultSlot = MakeSingleTupleTableSlot(self->desc);
+	self->funcResultSlot = MakeSingleTupleTableSlot(self->desc, &TTSOpsHeapTuple);
 }
 
 static int64
