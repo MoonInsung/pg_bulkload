@@ -400,7 +400,11 @@ restart:
 									 self->funcResultSlot))
 			return NULL;
 
+#if PG_VERSION_NUM >= 120000
+		datum = ExecFetchSlotHeapTupleDatum(self->funcResultSlot);
+#else
 		datum = ExecFetchSlotTupleDatum(self->funcResultSlot);
+#endif
 		set_datum_tuple(self, datum);
 
 		return &self->tuple;

@@ -545,7 +545,11 @@ CheckerConstraints(Checker *checker, HeapTuple tuple, int *parsing_field)
 		*parsing_field = 0;
 
 		/* Place tuple in tuple slot */
+#if PG_VERSION_NUM >= 120000
+		ExecStoreHeapTuple(tuple, checker->slot, false);
+#else
 		ExecStoreTuple(tuple, checker->slot, InvalidBuffer, false);
+#endif
 
 		/* Check the constraints of the tuple */
 #if PG_VERSION_NUM == 100000
@@ -759,12 +763,14 @@ tupledesc_match(TupleDesc dst_tupdesc, TupleDesc src_tupdesc)
 {
 	int			i;
 
+#if PG_VERSION_NUM < 120000
 	if (dst_tupdesc->tdhasoid != src_tupdesc->tdhasoid)
 		ereport(ERROR,
 				(errcode(ERRCODE_DATATYPE_MISMATCH),
 				 errmsg("function return record definition and target table record definition do not match"),
 				 errdetail("Returned record hasoid %d, but target table hasoid %d.",
 						   src_tupdesc->tdhasoid, dst_tupdesc->tdhasoid)));
+#endif
 
 	if (dst_tupdesc->natts != src_tupdesc->natts)
 		ereport(ERROR,
