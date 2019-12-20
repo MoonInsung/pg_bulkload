@@ -636,7 +636,6 @@ _bt_mergeload(Spooler *self, BTWriteState *wstate, BTSpool *btspool, BTReader *b
 
 #if PG_VERSION_NUM >= 120000
 	pfree(btIndexScanKey);
-	pfree(indexScanKey);
 #else
 	_bt_freeskey(indexScanKey);
 #endif
