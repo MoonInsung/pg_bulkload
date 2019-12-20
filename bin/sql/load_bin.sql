@@ -1,3 +1,4 @@
+SET extra_float_digits = 0;
 TRUNCATE customer;
 
 \! pg_bulkload -d contrib_regression data/bin1.ctl -i infile_logfile -l infile_logfile -P pbfile -u dbfile
