@@ -1,3 +1,4 @@
+SET extra_float_digits = 0;
 TRUNCATE customer;
 \! export PGCLIENTENCODING=utf-8; pg_bulkload -d contrib_regression data/csv6.ctl -o"delimiter=|" -i stdin < data/data1.csv -l results/remote1.log -P results/remote1.prs -u results/remote1.dup -o "PARSE_ERRORS=50"
 NOTICE: BULK LOAD START

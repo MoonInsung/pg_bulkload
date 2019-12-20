@@ -428,8 +428,6 @@ SELECT * FROM customer ORDER BY c_id;
 -- do not error skip an error after of toast_insert_or_update.
 \! pg_bulkload -d contrib_regression data/csv2.ctl -i data/data3.csv -o "SKIP=1" -o "LOAD=4" -o "VERBOSE=YES" -l results/csv6.log -P results/csv6.prs -u results/csv6.dup
 NOTICE: BULK LOAD START
-WARNING:  Parse error Record 1: Input Record 2: Rejected - column 3. invalid input syntax for integer: "int4"
-WARNING:  Maximum parse error count exceeded - 1 error(s) found in input file
 ERROR: query failed: ERROR:  integer out of range
 DETAIL: query was: SELECT * FROM pgbulkload.pg_bulkload($1)
 \! awk -f data/adjust.awk results/csv6.log
@@ -457,12 +455,10 @@ DUPLICATE_ERRORS = 10
 ON_DUPLICATE_KEEP = NEW
 TRUNCATE = NO
 
-Parse error Record 1: Input Record 2: Rejected - column 3. invalid input syntax for integer: "int4"
-Maximum parse error count exceeded - 1 error(s) found in input file
 integer out of range
 \! pg_bulkload -d contrib_regression data/csv2.ctl -i data/data3.csv -o "SKIP=2" -o "LOAD=4" -o "VERBOSE=YES" -l results/csv7.log -P results/csv7.prs -u results/csv7.dup -o "PARSE_ERRORS=50"
 NOTICE: BULK LOAD START
-WARNING:  Parse error Record 1: Input Record 1: Rejected - column 3. invalid input syntax for integer: "int4"
+WARNING:  Parse error Record 1: Input Record 1: Rejected - column 3. invalid input syntax for type integer: "int4"
 WARNING:  Parse error Record 2: Input Record 2: Rejected - column 2. value "32768" is out of range for type smallint
 WARNING:  Parse error Record 3: Input Record 3: Rejected - column 3. value "2147483648" is out of range for type integer
 WARNING:  Parse error Record 4: Input Record 4: Rejected - column 4. value too long for type character varying(16)
@@ -507,7 +503,7 @@ DUPLICATE_ERRORS = 10
 ON_DUPLICATE_KEEP = NEW
 TRUNCATE = NO
 
-Parse error Record 1: Input Record 1: Rejected - column 3. invalid input syntax for integer: "int4"
+Parse error Record 1: Input Record 1: Rejected - column 3. invalid input syntax for type integer: "int4"
 Parse error Record 2: Input Record 2: Rejected - column 2. value "32768" is out of range for type smallint
 Parse error Record 3: Input Record 3: Rejected - column 3. value "2147483648" is out of range for type integer
 Parse error Record 4: Input Record 4: Rejected - column 4. value too long for type character varying(16)
