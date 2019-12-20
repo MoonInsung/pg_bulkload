@@ -1,3 +1,4 @@
+SET extra_float_digits = 0;
 \set BEFORE_NSHM `ipcs -m | grep -c [0-9]`
 TRUNCATE customer;
 \! pg_bulkload -d contrib_regression data/csv1.ctl -o"delimiter=|" -i data/data1.csv -o "MULTI_PROCESS=YES" -l results/parallel1.log -P results/parallel1.prs -u results/parallel1.dup -o "PARSE_ERRORS=50"
