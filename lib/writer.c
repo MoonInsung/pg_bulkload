@@ -52,9 +52,18 @@ WriterCreate(char *writer, bool multi_process)
 	/* alias for backward compatibility. */
 	if (pg_strcasecmp(writer, "PARALLEL") == 0)
 	{
+#if PG_VERSION_NUM >= 120000
+		elog(WARNING,"In the current version, it cannot be used the PARALLEL \
+					  option of pg_bulkload when using PG12. This will be fixed later.");
+#else
 		multi_process = true;
+#endif
 		writer = "DIRECT";
 	}
+
+#if PG_VERSION_NUM >= 120000
+	multi_process = false;
+#endif
 
 	self = values[choice("WRITER", writer, keys, lengthof(keys))](NULL);
 
